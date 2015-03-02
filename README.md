@@ -6,6 +6,12 @@ Small Python wrapper to access the WhoIsXMLAPI and save to a MySql database.
 
 Copy `config.sample.py` to `config.py` and enter values, create a matching database/table in MySql in localhost.
 
+## requirements
+
+- Python3  
+- MySql Connector 
+
+
 ## license
 
 MIT
