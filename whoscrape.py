@@ -15,6 +15,7 @@ class WhoScrape:
     self.username = config.username
     self.password = config.password
     self.format   = config.format
+    self.database = config.database
 
   def run(self):
     f = open('domains','r')
@@ -22,8 +23,12 @@ class WhoScrape:
       self.domain = line.strip()
       print("Checking domain: " + self.domain)
       data = self.getWhoIs()
-      print(data)
-      # self.sqlInsert(data)
+      if(data):
+        print('Saving data...')
+        self.sqlInsert(data)
+      else:
+        print('Data not saved.')
+        print(data)
 
   def getWhoIs(self):
     data = False
@@ -38,14 +43,15 @@ class WhoScrape:
         "email": result['WhoisRecord']['registrant']['email'],
         "registrar": result['WhoisRecord']['registrarName']
       }
-
+    else:
+      print(result)
     return data
 
   def sqlInsert(self, data):
-    cnx = mysql.connector.connect(user='root', database='domains')
+    cnx = mysql.connector.connect(user=self.database.db_user, database=self.database.db_name)
     cursor = cnx.cursor()
 
-    add_domain = ("INSERT INTO bulk "
+    add_domain = ("INSERT INTO self.database.db_table "
                    "(domain, email, registrar) "
                    "VALUES (%s, %s, %s)")
 
