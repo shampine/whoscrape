@@ -16,6 +16,7 @@ class WhoScrape:
     self.password = config.password
     self.format   = config.format
     self.database = config.database
+    self.mock     = config.mock
 
   def run(self):
     f = open('domains','r')
@@ -31,27 +32,35 @@ class WhoScrape:
         print(data)
 
   def getWhoIs(self):
-    data = False
-    url  = 'http://www.whoisxmlapi.com/whoisserver/WhoisService?domainName=' + self.domain + '&username=' + self.username + '&password=' + self.password + '&outputFormat=' + self.format
-    connect = urllib.request.urlopen(url)
-    result  = json.loads(connect.readall().decode('utf8'))
-    connect.close()
-     
-    if ('WhoisRecord' in result):
+    if(self.mock):
       data = {
-        "domain": self.domain,
-        "email": result['WhoisRecord']['registrant']['email'],
-        "registrar": result['WhoisRecord']['registrarName']
+        "domain": "testing.com",
+        "email": "test@example.com",
+        "registrar": "Enom, Inc."
       }
     else:
-      print(result)
+      data = False
+      url  = 'http://www.whoisxmlapi.com/whoisserver/WhoisService?domainName=' + self.domain + '&username=' + self.username + '&password=' + self.password + '&outputFormat=' + self.format
+      connect = urllib.request.urlopen(url)
+      result  = json.loads(connect.readall().decode('utf8'))
+      connect.close()
+       
+      if ('WhoisRecord' in result):
+        data = {
+          "domain": self.domain,
+          "email": result['WhoisRecord']['registrant']['email'],
+          "registrar": result['WhoisRecord']['registrarName']
+        }
+      else:
+        print(result)
     return data
 
   def sqlInsert(self, data):
+    table = self.database['db_table']
     cnx = mysql.connector.connect(user=self.database['db_user'], database=self.database['db_name'])
     cursor = cnx.cursor()
 
-    add_domain = ("INSERT INTO self.database['db_table'] "
+    add_domain = ("INSERT INTO " + table + " "
                    "(domain, email, registrar) "
                    "VALUES (%s, %s, %s)")
 
