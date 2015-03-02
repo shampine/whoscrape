@@ -48,14 +48,14 @@ class WhoScrape:
     return data
 
   def sqlInsert(self, data):
-    cnx = mysql.connector.connect(user=self.database.db_user, database=self.database.db_name)
+    cnx = mysql.connector.connect(user=self.database['db_user'], database=self.database['db_name'])
     cursor = cnx.cursor()
 
-    add_domain = ("INSERT INTO self.database.db_table "
+    add_domain = ("INSERT INTO self.database['db_table'] "
                    "(domain, email, registrar) "
                    "VALUES (%s, %s, %s)")
 
-    data_domain = (data.domain, data.email, data.registrar)
+    data_domain = (data['domain'], data['email'], data['registrar'])
 
     cursor.execute(add_domain, data_domain)
 
